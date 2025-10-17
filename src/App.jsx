@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import './App.css';
 import backgroundImage from './assets/background1.jpg';  // Correct the path
 import tutorImage from './assets/waleedProfilePicture.jpg';  // Correct the path
+import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
+import { db } from './firebaseConfig.js';
 
 function App() {
   const [courses, setCourses] = useState([]);
@@ -26,29 +28,21 @@ function App() {
   const headerHeight = Math.max(100 - scrollY / 10, 50); // Shrinks from 100vh to 50vh
   const tutorSectionHeight = Math.max(100 - scrollY / 10, 50);  // Same effect for tutor section
 
-  const newCourse = {
-    id: 'ai-tools-course',
-    title: 'AI Tools',
-    purpose:'الهدف: أن يكتسب المشاركون في هذه الدورة القدرة على التعامل مع أدوات الذكاء الصناعي وفهم التكامل فيما بينها ودمجها ضمن إطار عمل الفرد.',
-    duration:'المدة: 18 ساعة.',
-    description: `
-      المحاور:
-      1. تعريف بالذكاء الصناعي وأهميته اليوم ومخاطره.
-      2. أدوات اللغة الطبيعية (المساعد الشخصي).
-      3. فهم كيفية التعامل مع الذكاء الصناعي (engineering Prompt).
-      4. أدوات الذكاء الصناعي التوليدي:
-          - أدوات المساعدة في تصميم وإنتاج الفيديو.
-          - أدوات تصميم الصور والجرافيك.
-      5. أدوات الذكاء الصناعي المكملة أو المساعدة:
-          - أدوات توليد الصوت.
-          - أدوات صنع العروض التقديمية.
-      6. تكامل أدوات الذكاء الصناعي وزيادة الإنتاجية.
-    `,
-  };
-
   useEffect(() => {
-    // For now, we can manually add the new course to the list
-    setCourses([newCourse]);
+    const fetchCourses = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'waleedservices'));
+        const coursesArray = querySnapshot.docs.map(doc => ({
+          id: doc.id,      // Firestore doc ID
+          ...doc.data()    // Spread the document fields
+        }));
+        setCourses(coursesArray);
+      } catch (error) {
+        console.error("Error fetching courses:", error);
+      }
+    };
+
+    fetchCourses();
   }, []);
 
   return (
@@ -62,7 +56,7 @@ function App() {
         }}
       >
         <div className="header-content">
-          <h1 className="header-title">Be Part of the Future</h1>
+          <h1 className="header-title">Be  Part of the Future</h1>
           <p className="header-subtitle">Explore and enroll in our top-rated offerings.</p>
         </div>
       </header>
@@ -117,17 +111,6 @@ function App() {
         </iframe>
       </section>
 
-      <section className="video">
-        <h2>مقدمة بسيطة</h2>
-        <iframe
-          width="560"
-          height="315"
-          src="https://www.youtube.com/embed/YOUR_VIDEO_ID"
-          title="Intro Video"
-          frameBorder="0"
-          allowFullScreen
-        ></iframe>
-      </section>
 
       <footer
         className="footer"
@@ -192,3 +175,27 @@ function App() {
 }
 
 export default App;
+
+
+
+
+
+// const newCourse = {
+//   id: 'ai-tools-course',
+//   title: 'AI Tools',
+//   purpose: 'الهدف: أن يكتسب المشاركون في هذه الدورة القدرة على التعامل مع أدوات الذكاء الصناعي وفهم التكامل فيما بينها ودمجها ضمن إطار عمل الفرد.',
+//   duration: 'المدة: 18 ساعة.',
+//   description: `
+//     المحاور:
+//     1. تعريف بالذكاء الصناعي وأهميته اليوم ومخاطره.
+//     2. أدوات اللغة الطبيعية (المساعد الشخصي).
+//     3. فهم كيفية التعامل مع الذكاء الصناعي (engineering Prompt).
+//     4. أدوات الذكاء الصناعي التوليدي:
+//         - أدوات المساعدة في تصميم وإنتاج الفيديو.
+//         - أدوات تصميم الصور والجرافيك.
+//     5. أدوات الذكاء الصناعي المكملة أو المساعدة:
+//         - أدوات توليد الصوت.
+//         - أدوات صنع العروض التقديمية.
+//     6. تكامل أدوات الذكاء الصناعي وزيادة الإنتاجية.
+//   `,
+// };
